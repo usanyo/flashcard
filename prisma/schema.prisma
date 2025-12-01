@@ -1,0 +1,51 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../app/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["flashcard"]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  name      String?
+
+  @@schema("flashcard")
+}
+
+model Word {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  english   String      @unique
+  past      String
+  hungarian String
+  flashcard Flashcard[]
+
+  @@schema("flashcard")
+}
+
+model Flashcard {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  wordId        Int
+  word          Word     @relation(fields: [wordId], references: [id])
+  remainingHits Int      @default(2)
+  deckId        Int
+  deck          Deck     @relation(fields: [deckId], references: [id])
+
+  @@schema("flashcard")
+}
+
+model Deck {
+  id         Int         @id @default(autoincrement())
+  createdAt  DateTime    @default(now())
+  name       String      @unique
+  flashcards Flashcard[]
+
+  @@schema("flashcard")
+}
